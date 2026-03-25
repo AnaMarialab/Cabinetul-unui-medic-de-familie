@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Adaugă Pacient Nou</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; display: flex; justify-content: center; padding-top: 50px; }
+        .form-container { background: white; padding: 40px; border-radius: 8px; width: 400px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; }
+        h2 { text-align: center; color: #2c3e50; }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>Adăugare Pacient</h2>
+    <div th:if="${eroare}" style="background-color: #fadbd8; color: #c0392b; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #e6b0aa;">
+        ⚠️ <span th:text="${eroare}">Eroare</span>
+    </div>
+    <form action="/medic/pacient/salveaza" method="post" th:object="${pacientNou}">
+        <label>Nume:</label>
+        <input type="text" th:field="*{nume}" required>
+
+        <label>Prenume:</label>
+        <input type="text" th:field="*{prenume}" required>
+
+        <label>CNP:</label>
+        <input type="text" th:field="*{cnp}" required>
+
+        <label>Data Nașterii (YYYY-MM-DD):</label>
+        <input type="date" th:field="*{dataNasterii}" required>
+
+        <label>Județ:</label>
+        <input type="text" th:field="*{judetDomiciliu}" required>
+
+        <hr>
+        <label>Email (Login):</label>
+        <input type="email" th:field="*{email}" required>
+
+        <label>Parolă:</label>
+        <input type="text" th:field="*{parola}" required>
+
+        <button type="submit">Salvează Pacient</button>
+    </form>
+    <div style="text-align: center; margin-top: 15px;">
+        <a href="/medic/dashboard" style="color: #7f8c8d; text-decoration: none;">Anulează</a>
+    </div>
+</div>
+</body>
+</html>

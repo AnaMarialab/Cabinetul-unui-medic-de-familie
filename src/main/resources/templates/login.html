@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Autentificare - Cabinet Medical</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .role-selector {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            background-color: #eef2f7;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .role-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .role-option input {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcdd2;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Cabinet Medical</h2>
+
+    <div th:if="${error}" class="error-message">
+        <span th:text="${error}">Eroare de autentificare</span>
+    </div>
+
+    <form action="/login" method="post">
+
+        <div class="role-selector">
+            <label class="role-option">
+                <input type="radio" name="tipUtilizator" value="pacient" checked>
+                Pacient
+            </label>
+            <label class="role-option">
+                <input type="radio" name="tipUtilizator" value="medic">
+                Medic
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required placeholder="ex: ana.popescu@yahoo.com">
+        </div>
+
+        <div class="form-group">
+            <label for="parola">Parolă:</label>
+            <input type="password" id="parola" name="parola" required placeholder="Introduceți parola">
+        </div>
+
+        <button type="submit">Autentificare</button>
+    </form>
+</div>
+
+</body>
+</html>

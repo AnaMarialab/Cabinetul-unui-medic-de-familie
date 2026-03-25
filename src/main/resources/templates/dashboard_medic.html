@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Medic - Cabinet Medical</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        header { background-color: #2c3e50; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header-title { font-size: 20px; font-weight: bold; }
+        .user-info { display: flex; align-items: center; gap: 20px; }
+        .logout-btn { background-color: #e74c3c; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-size: 14px; transition: background 0.3s; }
+        .logout-btn:hover { background-color: #c0392b; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 20px; width: 100%; box-sizing: border-box; }
+        h3 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; margin-bottom: 20px; }
+        .requests-section { background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 40px; padding: 25px; border-left: 5px solid #e67e22; }
+        .search-container { background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 25px; border-left: 5px solid #3498db; }
+        .approval-form { display: flex; gap: 10px; align-items: center; }
+        .approval-form input { padding: 5px; border: 1px solid #ddd; border-radius: 3px; }
+        .btn-approve { background-color: #27ae60; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-weight: bold; }
+        .btn-approve:hover { background-color: #219150; }
+        .search-box { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; background-color: #f8f9fa; padding: 20px; border-radius: 5px; }
+        .search-input { width: 50%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        .search-btn { padding: 12px 25px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .search-btn:hover { background-color: #2980b9; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background-color: #34495e; color: white; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .patient-row:hover { background-color: #f1f2f6; cursor: pointer; }
+        .action-btn { background-color: #3498db; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 13px; margin-right: 5px; }
+        .empty-msg { text-align: center; color: #7f8c8d; padding: 10px; font-style: italic; }
+        .nav-buttons { margin-bottom: 20px; display: flex; gap: 10px; }
+        .nav-btn { color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .btn-agenda { background: #8e44ad; }
+        .btn-add { background: #27ae60; }
+        .btn-stats { background: #e67e22; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-title">Cabinet Medical - Modul Doctor</div>
+    <div class="user-info">
+        <span th:text="'Dr. ' + ${medic.nume} + ' ' + ${medic.prenume}">Dr. Popescu Ion</span>
+        <a href="/logout" class="logout-btn">Deconectare</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="nav-buttons">
+        <a href="/medic/agenda" class="nav-btn btn-agenda">📅 Vezi Agenda Completă</a>
+        <a href="/medic/pacient/nou" class="nav-btn btn-add">➕ Adaugă Pacient Nou</a>
+        <a href="/medic/statistici" class="nav-btn btn-stats">📊 Statistici & Rapoarte</a>
+    </div>
+
+    <div class="requests-section">
+        <h3>🔔 Cereri de Programare în Așteptare</h3>
+        <div th:if="${cereri == null || cereri.isEmpty()}" class="empty-msg">Nu există cereri noi de programare.</div>
+        <table th:if="${cereri != null && !cereri.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Pacient</th>
+                <th>CNP</th>
+                <th>Motiv Vizită</th>
+                <th>Data Solicitării</th>
+                <th>Acțiune</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${cereri}">
+                <td th:text="${c.Nume} + ' ' + ${c.Prenume}" style="font-weight: bold;"></td>
+                <td th:text="${c.CNP}"></td>
+                <td th:text="${c.Motiv}"></td>
+                <td th:text="${c.DataCerere}"></td>
+                <td>
+                    <form action="/medic/aprobaProgramare" method="post" class="approval-form">
+                        <input type="hidden" name="programareId" th:value="${c.ProgramareID}">
+                        <input type="date" name="data" required>
+                        <input type="time" name="ora" required>
+                        <button type="submit" class="btn-approve">Aprobă</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="search-container">
+        <h3>🔍 Căutare și Gestionare Pacienți</h3>
+        <div class="search-box">
+            <form action="/medic/cauta" method="get" style="display: flex; width: 100%; justify-content: center; gap: 10px;">
+                <input type="text" name="termenCautare" class="search-input" placeholder="Introduceți Numele sau Numele și Prenumele..." th:value="${termenCautare}">
+                <button type="submit" class="search-btn">Caută Pacient</button>
+            </form>
+        </div>
+
+        <div class="results-table">
+            <div th:if="${pacienti.isEmpty()}" class="empty-msg">
+                <span th:if="${termenCautare != null}">Nu s-au găsit pacienți activi.</span>
+                <span th:if="${termenCautare == null}">Folosiți bara de căutare.</span>
+            </div>
+            <table th:if="${!pacienti.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>CNP</th>
+                    <th>Nume Complet</th>
+                    <th>Data Nașterii</th>
+                    <th>Județ</th>
+                    <th>Acțiuni</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${pacienti}" class="patient-row" th:ondblclick="'window.location.href=\'/medic/pacient/' + ${p.pacientID} + '\''">
+                    <td th:text="${p.cnp}"></td>
+                    <td th:text="${p.nume} + ' ' + ${p.prenume}"></td>
+                    <td th:text="${p.dataNasterii}"></td>
+                    <td th:text="${p.judetDomiciliu}"></td>
+                    <td>
+                        <a th:href="@{'/medic/pacient/' + ${p.pacientID}}" class="action-btn">Vezi Dosar</a>
+
+                        <form action="/medic/pacient/sterge" method="post" style="display:inline;" onsubmit="return confirm('Sigur dorești să dezactivezi acest pacient? Istoricul va fi păstrat.');">
+                            <input type="hidden" name="id" th:value="${p.pacientID}">
+                            <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-left: 5px;">Dezactivează</button>
+                        </form>
+
+                        <form action="/medic/pacient/stergeDefinitiv" method="post" style="display:inline;" onsubmit="return confirm('ATENȚIE! Această ștergere este DEFINITIVĂ și va șterge tot istoricul pacientului! Continuați?');">
+                            <input type="hidden" name="id" th:value="${p.pacientID}">
+                            <button type="submit" style="background: black; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-left: 5px;">Șterge Definitiv</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

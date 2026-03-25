@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistici și Rapoarte</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; color: #2c3e50; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h3 { border-bottom: 2px solid #3498db; padding-bottom: 10px; color: #2980b9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #ecf0f1; padding: 8px; text-align: left; }
+        td { border-bottom: 1px solid #eee; padding: 8px; }
+        .back-btn { display: inline-block; margin-bottom: 20px; padding: 10px 20px; background: #2c3e50; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/medic/dashboard" class="back-btn">← Înapoi la Dashboard</a>
+    <h1>📊 Rapoarte Medicale (SQL Complex)</h1>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Top Pacienți (Filtrare Complexă)</h3>
+
+            <form action="/medic/statistici" method="get" style="margin-bottom: 15px; background: #ecf0f1; padding: 10px; border-radius: 5px;">
+                <label>Arată pacienții cu minim:</label>
+                <input type="number" name="minVizite" th:value="${minViziteSelectat}" min="1" style="width: 50px; padding: 5px;">
+                <span>vizite</span>
+                <button type="submit" style="background: #2980b9; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">Filtrează</button>
+            </form>
+
+            <table>
+                <tr><th>Nume</th><th>Vizite</th></tr>
+                <tr th:each="row : ${topPacienti}">
+                    <td th:text="${row.Nume} + ' ' + ${row.Prenume}"></td>
+                    <td th:text="${row.NumarVizite}"></td>
+                </tr>
+            </table>
+            <p th:if="${topPacienti.isEmpty()}" style="color: red; font-size: 0.9em; margin-top: 10px;">Niciun rezultat pentru acest filtru.</p>
+        </div>
+
+        <div class="card">
+            <h3>Top Pacienți după Nr. Vizite</h3>
+            <table>
+                <tr><th>Nume</th><th>Vizite</th></tr>
+                <tr th:each="row : ${topPacienti}">
+                    <td th:text="${row.Nume} + ' ' + ${row.Prenume}"></td>
+                    <td th:text="${row.NumarVizite}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Tratamente Prescrise (Detaliat)</h3>
+            <table>
+                <tr><th>Pacient</th><th>Tratament</th><th>Zile</th></tr>
+                <tr th:each="row : ${tratamenteDetaliate}">
+                    <td th:text="${row.Nume}"></td>
+                    <td th:text="${row.Tratament}"></td>
+                    <td th:text="${row.DurataZile}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Pacienți FĂRĂ nicio programare</h3>
+            <table>
+                <tr><th>Nume</th><th>CNP</th></tr>
+                <tr th:each="row : ${pacientiFaraVizite}">
+                    <td th:text="${row.Nume} + ' ' + ${row.Prenume}"></td>
+                    <td th:text="${row.CNP}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Diagnostice Utilizate în Clinică</h3>
+            <ul>
+                <li th:each="row : ${diagnosticeFolosite}" th:text="${row.Denumire}"></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>Pacienți Recenți (Ultima lună)</h3>
+            <table>
+                <tr th:each="row : ${pacientiRecenti}">
+                    <td th:text="${row.Nume} + ' ' + ${row.Prenume}"></td>
+                    <td th:text="${row.Email}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Cel mai lung tratament prescris</h3>
+            <div th:each="row : ${tratamentMaxim}">
+                <b th:text="${row.Tratament}"></b> <br>
+                Durata: <span th:text="${row.DurataZile}"></span> zile
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card" style="border-left: 5px solid #8e44ad;" th:if="${procesareJava}">
+    <h3 style="color: #8e44ad;">📊 Demografie (Procesare Java Streams)</h3>
+    <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 10px;">
+            <strong>Vârsta Medie a Pacienților:</strong>
+            <span th:text="${varstaMedie} + ' ani'" style="background: #eee; padding: 2px 5px; border-radius: 3px;"></span>
+        </li>
+        <li style="margin-bottom: 10px;">
+            <strong>Cel mai tânăr:</strong>
+            <span th:text="${celMaiTanar.nume} + ' ' + ${celMaiTanar.prenume}"></span>
+            (<span th:text="${celMaiTanar.dataNasterii}"></span>)
+        </li>
+        <li>
+            <strong>Cel mai în vârstă:</strong>
+            <span th:text="${celMaiBatran.nume} + ' ' + ${celMaiBatran.prenume}"></span>
+            (<span th:text="${celMaiBatran.dataNasterii}"></span>)
+        </li>
+    </ul>
+</div>
+</body>
+</html>

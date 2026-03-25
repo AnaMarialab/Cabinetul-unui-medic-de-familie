@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dosar Medical</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa; margin: 0; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
+
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px; }
+
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+        h3 { color: #2c3e50; margin-top: 0; }
+
+        .patient-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .info-group label { font-weight: bold; color: #7f8c8d; display: block; }
+        .info-group span { font-size: 18px; color: #2c3e50; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background-color: #34495e; color: white; text-align: left; padding: 10px; }
+        td { border-bottom: 1px solid #eee; padding: 10px; }
+
+        .add-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #eef2f7; padding: 20px; border-radius: 5px; }
+        .form-row { display: flex; flex-direction: column; }
+        input, select, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button.btn-add { grid-column: span 2; background-color: #27ae60; color: white; padding: 10px; border: none; cursor: pointer; font-size: 16px; border-radius: 4px; }
+        button.btn-add:hover { background-color: #219150; }
+
+        .back-link { display: inline-block; margin-bottom: 20px; color: #3498db; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="/medic/dashboard" class="back-link">← Îmapoi la Căutare</a>
+
+    <div class="card">
+        <h2>Fișă Pacient: <span th:text="${pacient.nume} + ' ' + ${pacient.prenume}"></span></h2>
+        <div class="patient-info">
+            <div class="info-group"><label>CNP</label><span th:text="${pacient.cnp}"></span></div>
+            <div class="info-group"><label>Data Nașterii</label><span th:text="${pacient.dataNasterii}"></span></div>
+            <div class="info-group"><label>Județ/Oraș</label><span th:text="${pacient.judetDomiciliu} + ', ' + ${pacient.orasDomiciliu}"></span></div>
+            <div class="info-group"><label>Asigurare</label><span th:text="${pacient.casaDeAsigurari}"></span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Istoric Consultații & Diagnostice</h3>
+        <table th:if="${!istoric.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Data</th>
+                <th>Motiv</th>
+                <th>Diagnostic Stabilit</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${istoric}">
+                <td th:text="${row.Data} + ' (' + ${row.Ora} + ')'"></td>
+                <td th:text="${row.Motiv}"></td>
+                <td th:text="${row.Diagnostic}" style="font-weight: bold; color: #c0392b;"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${istoric.isEmpty()}" style="color: #999;">Nu există istoric înregistrat.</p>
+    </div>
+
+    <div class="card">
+        <h3>Tratamente Prescrise (Dosar)</h3>
+        <table th:if="${!tratamente.isEmpty()}">
+            <thead>
+            <tr>
+                <th>Tratament</th>
+                <th>Durata (Zile)</th>
+                <th>Observații</th>
+                <th>Diagnostic Asociat</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${tratamente}">
+                <td th:text="${t.Tratament}"></td>
+                <td th:text="${t.DurataZile}"></td>
+                <td th:text="${t.Observatii}"></td>
+                <td th:text="${t.DiagnosticCauza}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${tratamente.isEmpty()}" style="color: #999;">Nu există tratamente active.</p>
+    </div>
+
+    <div class="card">
+        <h3>Adaugă Consultație & Diagnostic Nou</h3>
+        <form th:action="@{'/medic/pacient/' + ${pacient.pacientID} + '/adaugaConsultatie'}" method="post" class="add-form">
+
+            <div class="form-row">
+                <label>Data:</label>
+                <input type="date" name="data" required>
+            </div>
+
+            <div class="form-row">
+                <label>Ora:</label>
+                <input type="time" name="ora" required>
+            </div>
+
+            <div class="form-row">
+                <label>Diagnostic:</label>
+                <select name="diagnosticId">
+                    <option th:each="d : ${listaDiagnostice}"
+                            th:value="${d.DiagnosticID}"
+                            th:text="${d.Denumire}"></option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>Motiv Consultație:</label>
+                <input type="text" name="motiv" placeholder="Ex: Dureri acute..." required>
+            </div>
+
+            <button type="submit" class="btn-add">Salvează în Dosar</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

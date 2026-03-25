@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Finalizare Consultație</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; padding: 40px; display: flex; justify-content: center; }
+        .container { background: white; padding: 40px; border-radius: 8px; width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+
+        label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+
+        textarea[readonly] { background-color: #e9ecef; color: #495057; }
+
+        button { width: 100%; margin-top: 25px; padding: 12px; background: #27ae60; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #219150; }
+
+        .cancel-link { display: block; text-align: center; margin-top: 15px; color: #7f8c8d; text-decoration: none; }
+    </style>
+
+    <script>
+        function completeazaTratament() {
+            var selectElement = document.getElementById("diagnosticSelect");
+
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+
+            var tratamentStandard = selectedOption.getAttribute("data-tratament");
+
+            document.getElementById("tratamentInput").value = tratamentStandard;
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>📝 Finalizare Consultație</h2>
+    <form action="/medic/consultatie/salveaza" method="post">
+        <input type="hidden" name="programareId" th:value="${programareId}">
+
+        <label>Diagnostic Stabilit:</label>
+        <select id="diagnosticSelect" name="diagnosticId" required onchange="completeazaTratament()">
+            <option value="" disabled selected>-- Alegeți Diagnosticul --</option>
+
+            <option th:each="d : ${listaDiagnostice}"
+                    th:value="${d.DiagnosticID}"
+                    th:text="${d.Denumire}"
+                    th:data-tratament="${d.TratamentStandard}"></option>
+        </select>
+
+        <label>Tratament (Completat Automat):</label>
+        <textarea id="tratamentInput" name="tratament" rows="3" readonly placeholder="Se va completa automat după selectarea diagnosticului..."></textarea>
+
+        <label>Durată Tratament (Zile):</label>
+        <input type="number" name="durata" min="1" value="1" required>
+
+        <label>Observații despre starea pacientului:</label>
+        <textarea name="observatii" rows="3" placeholder="Ex: Stare generală bună, revine la control peste 7 zile."></textarea>
+
+        <button type="submit">Salvează în Dosar & Finalizează</button>
+    </form>
+    <a href="/medic/agenda" class="cancel-link">Anulează</a>
+</div>
+</body>
+</html>
